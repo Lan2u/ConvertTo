@@ -6,11 +6,7 @@
 #define CONVERSIONS_FILE_PATH "../data/conversions"
 
 int main(int argc, char *argv[]) {
-    printf("ConvertTo Started!\n");
-
-    argc = argc - 1;
-
-    printf("%d Arguments!\n", argc);
+    argc = argc - 1; // Ignoring the first argument since it is just the name of the program
 
     switch (argc) {
         case 1: {
@@ -44,7 +40,6 @@ void runTests() {
 }
 
 void displayHelp() {
-    printf("To get help, wait until I write the documentation\n");
     printf("Usage: ConvertTo <Quantity> <unit> <output unit>\n");
 }
 
@@ -52,14 +47,8 @@ void displayHelp() {
 // Returns 1 if not
 // Result is put into the memory location at outMagnitude
 int convert(char *quantity, char *in_units, double *outMagnitude, char *out_units) {
-    printf("Starting conversion on quantity=%s in_units=%s out_units=%s\n", quantity, in_units, out_units);
     double magnitude;
     magnitude = atof(quantity);
-
-    if (magnitude <= 0.0) {
-        printf("Quantity isn't a double number > 0!");
-        return 1;
-    }
 
     struct conversion convert;
     convert = getConversion(in_units, out_units);
@@ -68,14 +57,10 @@ int convert(char *quantity, char *in_units, double *outMagnitude, char *out_unit
         // The conversion wasn't found
         printf("Failed to convert units\n");
         return 1;
-    } else {
-        printf("DEBUG factor = %f, offset = %f\n", convert.factor, convert.offset);
     }
 
+    // Out magnitude = in_magnitude * factor + offset
     *outMagnitude = magnitude * convert.factor + convert.offset;
-
-    printf("DEBUG val = %f , magnitude = %f\n", outMagnitude, magnitude);
-
     return 0;
 }
 
@@ -104,21 +89,16 @@ struct conversion getConversion(char *in_units, char *out_units) {
     do {
         fscanf(file, "%s", buf); // Load the first string (either # or a unit1)
         if (buf[0] == '#') { // A line starting with # means it is ignored
-            printf("Ignoring line as starts with #\n");
 
             int val = fgetc(file);
             while (val != '\n') {
-                printf("%c", val);
                 // Skip to end of line
                 val = fgetc(file);
             }
         } else { // The line should be processed
-            printf("Processing line\n");
 
             char unit1[BUF_SIZE];
             char unit2[BUF_SIZE];
-
-            // copyArrayUntil(unit1, NULL);
 
             strncpy(unit1, buf, BUF_SIZE);
             fscanf(file, "%s", buf); // Load the second units
@@ -127,7 +107,6 @@ struct conversion getConversion(char *in_units, char *out_units) {
 
             if (strcmp(&unit1[0], in_units) == 0 && strcmp(&unit2[0], out_units) == 0) {
                 // The conversion has been found the right way around
-                printf("Unit found right way around\n");
 
                 struct conversion conv;
                 fscanf(file, "%f", &conv.factor);
@@ -137,14 +116,13 @@ struct conversion getConversion(char *in_units, char *out_units) {
                 return conv;
             } else if (strcmp(&unit1[0], out_units) == 0 && strcmp(&unit2[0], in_units) == 0) {
                 // The conversion has been found the wrong way around
-                printf("Unit found wrong way around\n");
 
                 struct conversion conv;
 
+                // The conversion is found the other way (unit2 -> unit1)
+                // around so need to reverse the coefficient and offset:
                 float factor;
                 fscanf(file, "%f", &factor);
-                // The conversion is found the other way (unit2 -> unit1)
-                // around so need to reverse the coefficient and offset
                 conv.factor = (float) (1.0 / factor);
 
                 float offset;
@@ -167,12 +145,4 @@ struct conversion getConversion(char *in_units, char *out_units) {
     conv.offset = 0.0;
     fclose(file);
     return conv;
-}
-
-// Copy the given array1 into a new array stopping once the terminating character is reached
-void copyArrayUntil(char *array1, char terminateCharacter) {
-    int endPos;
-    int arraySize = sizeof(array1);
-    for (endPos = 0; array1[endPos] != terminateCharacter && endPos < arraySize; endPos++);
-    printf("The end pos is %d\n", endPos);
 }
