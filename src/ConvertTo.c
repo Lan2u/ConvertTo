@@ -3,8 +3,6 @@
 #include <mem.h>
 #include "ConvertTo.h"
 
-#define CONVERSIONS_FILE_PATH "../data/conversions"
-
 int main(int argc, char *argv[]) {
     argc = argc - 1; // Ignoring the first argument since it is just the name of the program
 
@@ -58,10 +56,6 @@ int convert(char *quantity, char *in_units, double *outMagnitude, char *out_unit
 }
 
 struct conversion getConversion(char *in_units, char *out_units) {
-    // Read from file unitl a conversion is found
-    // Return the conversion factor if it is found as in_unit to out_unit or (1/conversion_factor) if it is found as out_unit to in_unit
-    // Eg. kg g 1000
-    // If you were going from kg to g then 1000 is returned. If you are going from g to kg then 1/1000 = 0.001 is returned.
     char *mode = "r";
     FILE *file;
     file = fopen(CONVERSIONS_FILE_PATH, mode); // File opened
