@@ -1,0 +1,5 @@
+# List of conversions where:
+# Unit1 Unit2 Coefficient Offset
+# Unit2 = Coefficient * Unit1 + Offset
+kg g 1000 0
+c k 1 273
