@@ -13,18 +13,16 @@ int main(int argc, char *argv[]) {
             if (strcmp(argv[1], "-h") == 0) {
                 displayHelp();
                 return 0;
-            } else if (strcmp(argv[1], "-test") == 0) {
-                runTests();
-                return 0;
-            } else {
-
             }
         }
         case 3: {
             double outMag;
-            convert(argv[1], argv[2], &outMag, argv[3]);
-            printf("%s%s is equivalent to %f%s\n", argv[1], argv[2], outMag, argv[3]);
-            return 0;
+            if (convert(argv[1], argv[2], &outMag, argv[3])) {
+                printf("%s%s is equivalent to %f%s\n", argv[1], argv[2], outMag, argv[3]);
+                return 0;
+            } else {
+                return 1;
+            }
         }
         default:
             break;
@@ -34,17 +32,12 @@ int main(int argc, char *argv[]) {
     return 1;
 }
 
-void runTests() {
-    printf("Starting Tests\n");
-    printf("Finished Tests\n");
-}
-
 void displayHelp() {
     printf("Usage: ConvertTo <Quantity> <unit> <output unit>\n");
 }
 
-// Returns 0 if successful
-// Returns 1 if not
+// Returns 1 if successful
+// Returns 0 if not
 // Result is put into the memory location at outMagnitude
 int convert(char *quantity, char *in_units, double *outMagnitude, char *out_units) {
     double magnitude;
@@ -56,12 +49,12 @@ int convert(char *quantity, char *in_units, double *outMagnitude, char *out_unit
     if (convert.factor == 0.0 && convert.offset == 0.0) {
         // The conversion wasn't found
         printf("Failed to convert units\n");
-        return 1;
+        return 0;
     }
 
     // Out magnitude = in_magnitude * factor + offset
     *outMagnitude = magnitude * convert.factor + convert.offset;
-    return 0;
+    return 1;
 }
 
 struct conversion getConversion(char *in_units, char *out_units) {
@@ -86,8 +79,10 @@ struct conversion getConversion(char *in_units, char *out_units) {
     size_t BUF_SIZE = 64; // size_t = unsigned int
     char buf[BUF_SIZE];
 
+    int charRead;
     do {
-        fscanf(file, "%s", buf); // Load the first string (either # or a unit1)
+
+        charRead = fscanf(file, "%s", buf); // Load the first string (either # or a unit1)
         if (buf[0] == '#') { // A line starting with # means it is ignored
 
             int val = fgetc(file);
@@ -133,10 +128,8 @@ struct conversion getConversion(char *in_units, char *out_units) {
                 return conv;
             }
         }
-    } while (1); // Loop until end of file
-
+    } while (charRead > 0); // Loop until end of file
     // If we reach end of file without finding any units
-    printf("Reached EOF!\n");
 
     printf("Those units were not recognised!\n");
     // No units were found
