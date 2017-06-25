@@ -3,9 +3,10 @@
 #include <mem.h>
 #include "ConvertTo.h"
 
+char debug_output = 0; // Should the program print debug messages
+
 int main(int argc, char *argv[]) {
     argc = argc - 1; // Ignoring the first argument since it is just the name of the program
-
     switch (argc) {
         case 1: {
             if (strcmp(argv[1], "-h") == 0) {
@@ -69,11 +70,19 @@ struct conversion getConversion(char *in_units, char *out_units) {
         return conv;
     }
 
+    if (debug_output){
+        printf("The file was opened successfully!\n");
+    }
+
     // Buffer to hold data read from file
     size_t BUF_SIZE = 64; // size_t = unsigned int
     char buf[BUF_SIZE];
 
-    int charRead;
+    int charRead; // Stores the number of characters read each time the program starts a new line
+
+    if (debug_output) {
+        printf("The conversion units: in= %s out= %s\n", in_units, out_units);
+    }
     do {
 
         charRead = fscanf(file, "%s", buf); // Load the first string (either # or a unit1)
@@ -101,9 +110,16 @@ struct conversion getConversion(char *in_units, char *out_units) {
                 fscanf(file, "%f", &conv.factor);
                 fscanf(file, "%f", &conv.offset);
 
+                if (debug_output) {
+                    printf("The conversion was found the right way around!\n");
+                    printf("Unit1=%s Unit2=%s Factor =%f Offset =%f\n", unit1, unit2, conv.factor, conv.offset);
+                }
+
                 fclose(file);
                 return conv;
-            } else if (strcmp(&unit1[0], out_units) == 0 && strcmp(&unit2[0], in_units) == 0) {
+            }
+            /*
+            else if (strcmp(&unit1[0], out_units) == 0 && strcmp(&unit2[0], in_units) == 0) {
                 // The conversion has been found the wrong way around
 
                 struct conversion conv;
@@ -118,9 +134,14 @@ struct conversion getConversion(char *in_units, char *out_units) {
                 fscanf(file, "%f", &offset);
                 conv.offset = -offset;
 
+                if (verbose_output) {
+                    printf("The conversion was found the wrong way around!\n");
+                    printf("Unit1=%s Unit2=%s Factor =%f Offset =%f\n", unit1, unit2, conv.factor, conv.offset);
+                }
+
                 fclose(file);
                 return conv;
-            }
+            }*/
         }
     } while (charRead > 0); // Loop until end of file
     // If we reach end of file without finding any units

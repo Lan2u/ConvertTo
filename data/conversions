@@ -2,5 +2,8 @@
 # Unit1 Unit2 Coefficient Offset
 # Unit2 = Coefficient * Unit1 + Offset
 kg g 1000 0
+g kg 0.001 0
 c k 1 273
+k c 1 -273
 c F 1.8 32
+F c 0.5556 -17.7778
