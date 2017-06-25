@@ -119,6 +119,18 @@ struct conversion getConversion(char *in_units, char *out_units) {
                 return conv;
             }
             /*
+             *
+             * // TODO Change how the program works so a different form of the conversion formular is used if the
+             * // conversion is found the wrong way around which means don't need to store the conversion numbers
+             * // twice.
+             * // Unit1 = Factor * Unit2 + Coefficient
+             * // Unit2 = (Unit1 - Coefficient) / Factor
+             * // Factor and Coefficient don't change for going backwards or forwards for the same 2 units
+             * // Result = getConversion(char[] unit1, char[] unit2, double factor*, double offset*);
+             * // Result = 0 -> normal way round Unit1 = Factor * Unit2 + Coefficient
+             * // Result = 1 -> Reverse conversion: Unit2 = (Unit1 - Coefficient) / Factor
+             * // Result = -1 -> No conversion found
+             *
             else if (strcmp(&unit1[0], out_units) == 0 && strcmp(&unit2[0], in_units) == 0) {
                 // The conversion has been found the wrong way around
 
