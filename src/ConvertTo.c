@@ -3,12 +3,6 @@
 #include <mem.h>
 #include "ConvertTo.h"
 
-#define BUF_SIZE 64
-// Should the program print debug messages
-#define DEBUG_OUTPUT 1
-
-void skipLine(FILE *pIobuf);
-
 int main(int argc, char *argv[]) {
     argc = argc - 1; // Ignoring the first argument since it is just the name of the program
     switch (argc) {
@@ -35,26 +29,6 @@ int main(int argc, char *argv[]) {
     return 1;
 }
 
-void displayHelp() {
-    printf("Usage: ConvertTo <Quantity> <unit> <output unit>\n");
-}
-
-// Returns 0 if successful
-// Returns 1 if not
-// Result is put into the memory location at outMagnitude
-/*
-             *
-             * // TODO Change how the program works so a different form of the conversion formular is used if the
-             * // conversion is found the wrong way around which means don't need to store the conversion numbers
-             * // twice.
-             * // Unit1 = Factor * Unit2 + Coefficient
-             * // Unit2 = (Unit1 - Coefficient) / Factor
-             * // Factor and Coefficient don't change for going backwards or forwards for the same 2 units
-             * // Result = getConversion(char[] unit1, char[] unit2, double factor*, double offset*);
-             * // Result = 0 -> normal way round Unit1 = Factor * Unit2 + Coefficient
-             * // Result = 1 -> Reverse conversion: Unit2 = (Unit1 - Coefficient) / Factor
-             * // Result = -1 -> No conversion found
-             */
 int convert(char *quantity, char *in_units, double *outMagnitude, char *out_units) {
     if (DEBUG_OUTPUT) {
         printf("The conversion units: in= %s out= %s\n", in_units, out_units);
@@ -70,7 +44,7 @@ int convert(char *quantity, char *in_units, double *outMagnitude, char *out_unit
     if (file == NULL) {
         printf("Conversions couldn't be loaded\n");
         return 1;
-    }else if (DEBUG_OUTPUT){
+    } else if (DEBUG_OUTPUT) {
         printf("The file was opened successfully!\n");
     }
 
@@ -96,39 +70,39 @@ int convert(char *quantity, char *in_units, double *outMagnitude, char *out_unit
             if (strcmp(&unit1[0], in_units) == 0 && strcmp(&unit2[0], out_units) == 0) {
                 // The conversion has been found the right way around
 
-                float factor, offset;
-                fscanf(file, "%f", &factor);
-                fscanf(file, "%f", &offset);
+                float coefficient, offset;
+                fscanf(file, "%f", &coefficient); // Read in the coefficient
+                fscanf(file, "%f", &offset); // Read in the offset
 
                 if (DEBUG_OUTPUT) {
                     printf("The conversion was found the right way around!\n");
-                    printf("Unit1=%s Unit2=%s Factor =%f Offset =%f\n", unit1, unit2, factor, offset);
+                    printf("Unit1=%s Unit2=%s coefficient =%f Offset =%f\n", unit1, unit2, coefficient, offset);
                 }
 
-                *outMagnitude = factor * magnitude +offset;
+                *outMagnitude = coefficient * magnitude + offset;
 
                 fclose(file);
                 return 0;
-            } else if (strcmp(&unit1[0], out_units) == 0 && strcmp(&unit2[0], in_units) == 0){
+            } else if (strcmp(&unit1[0], out_units) == 0 && strcmp(&unit2[0], in_units) == 0) {
                 // The conversion has been found the wrong way around
-                float factor, offset;
-                fscanf(file, "%f", &factor);
+                float coefficient, offset;
+                fscanf(file, "%f", &coefficient);
                 fscanf(file, "%f", &offset);
 
                 if (DEBUG_OUTPUT) {
                     printf("The conversion was found the wrong way around!\n");
-                    printf("Unit1=%s Unit2=%s Factor =%f Offset =%f\n", unit1, unit2, factor, offset);
+                    printf("Unit1=%s Unit2=%s Coefficient =%f Offset =%f\n", unit1, unit2, coefficient, offset);
                 }
 
-                *outMagnitude = (magnitude - offset)/factor;
+                *outMagnitude = (magnitude - offset) / coefficient;
 
                 fclose(file);
                 return 0;
             }
         }
     } while (charRead > 0); // Loop until end of file
-    // If we reach end of file without finding any units
 
+    // If we reach end of file without finding any units
     printf("Those units were not recognised!\n");
     fclose(file);
     return 1;
@@ -139,4 +113,8 @@ void skipLine(FILE *file) {
     while (val != '\n') {
         val = fgetc(file);
     }
+}
+
+void displayHelp() {
+    printf("Usage: ConvertTo <Quantity> <unit> <output unit>\n");
 }

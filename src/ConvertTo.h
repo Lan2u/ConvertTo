@@ -5,19 +5,28 @@ Usage: ConvertTo <Quantity> <Unit>
 	- Gives the given quantity in a selection of units (preset)
 */
 
+// Max number of bytes read for each piece of information in the conversions file
+#define BUF_SIZE 64
+// Should the program print debug messages
+#define DEBUG_OUTPUT 1
+// Relative path to the conversions file
 #define CONVERSIONS_FILE_PATH "../data/conversions"
 
-struct conversion {
-    float factor; // unit2 = unit1 * factor + offset. The conversion from 2 to 1 is therefore (1/conversion)
-    float offset; // unit2 = unit1 * factor + offset. The conversion from 2 to 1 is therefore -offset
-};
-
+/* Converts the given quantity in the given units (in units) into the
+ * quantity (outMagnitude) in the desired units(out_units)
+ *
+ * Return 0 if successful
+ * Return 1 if not successful
+ *
+ * Result is put into the memory location at outMagnitude
+ * int convert(char *quantity, char *in_units, double *outMagnitude, char *out_units)
+ */
 int convert(char *, char *, double *, char *);
 
-// Read from file until a conversion is found
-// Return the conversion factor if it is found as in_unit to out_unit or (1/conversion_factor) if it is found as out_unit to in_unit
-// Eg. kg g 1000
-// If you were going from kg to g then 1000 is returned. If you are going from g to kg then 1/1000 = 0.001 is returned.
-struct conversion getConversion(char *in_units, char *out_units);
-
+/*
+ * Displays the help message.
+ */
 void displayHelp();
+
+// Skips to the place in the file after the next newline character in the line
+void skipLine(FILE *);
